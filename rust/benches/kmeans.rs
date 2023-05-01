@@ -15,9 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-use std::sync::Arc;
 
-use arrow_array::FixedSizeListArray;
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use pprof::criterion::{Output, PProfProfiler};
 
@@ -30,11 +28,10 @@ fn bench_train(c: &mut Criterion) {
 
     let dimension: i32 = 128;
     let array = generate_random_array(1024 * 4 * dimension as usize);
-    let data = Arc::new(FixedSizeListArray::try_new(&array, dimension).unwrap());
 
     c.bench_function("train_128d_4k", |b| {
         b.to_async(&rt).iter(|| async {
-            KMeans::new(data.clone(), 256, 25).await;
+            KMeans::new(&array, 256, 25, 100).await;
         })
     });
 
@@ -51,10 +48,9 @@ fn bench_train(c: &mut Criterion) {
     });
 
     let array = generate_random_array(1024 * 64 * dimension as usize);
-    let data = Arc::new(FixedSizeListArray::try_new(&array, dimension).unwrap());
     c.bench_function("train_128d_65535", |b| {
         b.to_async(&rt).iter(|| async {
-            KMeans::new(data.clone(), 256, 25).await;
+            KMeans::new(&array, 256, 25, 100).await;
         })
     });
 
@@ -72,10 +68,9 @@ fn bench_train(c: &mut Criterion) {
 
     let dimension = 8;
     let array = generate_random_array(1024 * 64 * dimension as usize);
-    let data = Arc::new(FixedSizeListArray::try_new(&array, dimension).unwrap());
     c.bench_function("train_8d_65535", |b| {
         b.to_async(&rt).iter(|| async {
-            KMeans::new(data.clone(), 256, 25).await;
+            KMeans::new(&array, 256, 25, 100).await;
         })
     });
 }

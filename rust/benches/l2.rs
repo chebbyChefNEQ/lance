@@ -64,7 +64,7 @@ fn bench_distance(c: &mut Criterion) {
         b.iter(|| unsafe {
             Float32Array::from_trusted_len_iter((0..target.len() / DIMENSION).map(|idx| {
                 let arr = target.slice(idx * DIMENSION, DIMENSION);
-                Some(l2_arrow(&key, as_primitive_array(arr.as_ref())))
+                Some(l2_arrow(&key, as_primitive_array(&arr)))
             }))
         });
     });
